@@ -1,0 +1,57 @@
+{
+  "notify": {
+    "mode_changed": "Noise Control: %s",
+    "bass_boost_changed": "Bass Boost: %s"
+  },
+  "panel": {
+    "battery": "Battery",
+    "charging": "Charging",
+    "guidance": "Connect your Sennheiser Momentum headphones via Bluetooth to view battery status and adjust audio controls.",
+    "mode": {
+      "active": "Noise Cancellation",
+      "anc": "Noise Cancellation",
+      "aware": "Transparency",
+      "transparency": "Transparency",
+      "off": "Off"
+    },
+    "noise_control": "Noise Control",
+    "transparency_level": "Transparency Level",
+    "status": {
+      "connected": "Connected",
+      "disconnected": "Not Connected"
+    },
+    "title": "Sennheiser Momentum",
+    "features": "Settings",
+    "settings_section": "Settings",
+    "bass_boost": "Bass Boost",
+    "bass_boost_desc": "Enhance low-end frequencies with punchy depth",
+    "sidetone": "Sidetone",
+    "sidetone_desc": "Hear your own voice naturally during phone calls",
+    "wear_detection": "Smart Pause",
+    "wear_detection_desc": "Pause audio automatically when headphones are removed",
+    "connect_button": "Connect Headphones"
+  },
+  "plugin": {
+    "description": "Battery monitor, active noise cancellation (ANC), transparency slider, and bass boost for Sennheiser Momentum headphones",
+    "name": "Sennheiser Momentum"
+  },
+  "settings": {
+    "device_mac": {
+      "description": "Bluetooth MAC address of your Momentum headphones. Leave blank to auto-detect.",
+      "label": "Momentum MAC Address"
+    },
+    "hide_when_disconnected": {
+      "description": "Hide the bar widget when the headphones are not connected.",
+      "label": "Hide when disconnected"
+    }
+  },
+  "widget": {
+    "action": {
+      "left_click": "Open Controls",
+      "right_click": "Cycle Noise Mode"
+    },
+    "mode": "Mode",
+    "not_connected": "Momentum not connected",
+    "available_to_connect": "Available to connect"
+  }
+}

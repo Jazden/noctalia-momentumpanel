@@ -1,0 +1,48 @@
+# Sennheiser Momentum for Noctalia
+# Controls Sennheiser Momentum headphones (battery, ANC modes, transparency level, bass boost).
+
+id = "jazden/momentum"
+name = "Sennheiser Momentum"
+version = "1.0.0"
+plugin_api = 24
+author = "jazden"
+license = "MIT"
+icon = "headphones"
+description = "Sennheiser Momentum battery monitor, ANC / Transparency modes, and Bass Boost in the Noctalia bar and popup panel."
+tags = ["audio", "bar", "panel", "service", "hardware", "indicator"]
+dependencies = ["python3"]
+
+[[setting]]
+key = "device_mac"
+type = "string"
+label_key = "settings.device_mac.label"
+description_key = "settings.device_mac.description"
+default = ""
+
+[[widget]]
+id = "momentum"
+entry = "widget.luau"
+
+  [widget.actions]
+  left = "panel-toggle jazden/momentum:panel"
+  right = "plugin jazden/momentum:service all cycle-noise"
+
+  [[widget.setting]]
+  key = "hide_when_disconnected"
+  type = "bool"
+  label_key = "settings.hide_when_disconnected.label"
+  description_key = "settings.hide_when_disconnected.description"
+  default = true
+
+[[panel]]
+id = "panel"
+entry = "panel.luau"
+width = 400
+height = 520
+placement = "floating"
+position = "top_center"
+open_near_click = false
+
+[[service]]
+id = "service"
+entry = "service.luau"
