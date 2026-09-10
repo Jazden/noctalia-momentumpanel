@@ -69,6 +69,10 @@ local function render()
 		{ key = noctalia.tr("widget.mode") or "Mode", value = getModeName(mode) },
 	}
 
+	if snapshot.codec and snapshot.codec ~= "" then
+		table.insert(tooltipRows, { key = "Codec", value = snapshot.codec })
+	end
+
 	if bLevel >= 0 then
 		local chargingStr = snapshot.charging and (" (" .. (noctalia.tr("panel.charging") or "Charging") .. ")") or ""
 		table.insert(tooltipRows, { key = noctalia.tr("panel.battery") or "Battery", value = tostring(bLevel) .. "%" .. chargingStr })

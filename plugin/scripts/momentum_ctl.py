@@ -52,6 +52,59 @@ def find_fallback_device():
         pass
     return None, None
 
+CODEC_PRETTY = {
+    "aptx_hd": "aptX HD",
+    "aptx_adaptive": "aptX Adaptive",
+    "aptx_ll": "aptX LL",
+    "aptx": "aptX",
+    "ldac": "LDAC",
+    "aac": "AAC",
+    "sbc": "SBC",
+    "sbc_xq": "SBC-XQ",
+    "lc3": "LC3",
+    "opus": "Opus",
+}
+
+def format_codec(codec_raw):
+    if not codec_raw:
+        return None
+    raw = codec_raw.strip().lower()
+    if raw in CODEC_PRETTY:
+        return CODEC_PRETTY[raw]
+    return codec_raw.replace("_", " ").upper()
+
+def detect_codec(mac):
+    if not mac:
+        return None
+    mac_under = mac.replace(":", "_").lower()
+    mac_colon = mac.lower()
+    # 1. Try pactl
+    try:
+        out = subprocess.check_output(["pactl", "list", "sinks"], text=True, stderr=subprocess.DEVNULL)
+        current_sink_mac = False
+        for line in out.splitlines():
+            line_str = line.strip()
+            if line_str.startswith("Name:"):
+                current_sink_mac = (mac_under in line_str.lower() or mac_colon in line_str.lower())
+            elif current_sink_mac and "api.bluez5.codec" in line_str:
+                m = re.search(r"=\s*\"?([^\"]+)\"?", line_str)
+                if m:
+                    return format_codec(m.group(1))
+    except Exception:
+        pass
+    # 2. Try pw-dump
+    try:
+        out = subprocess.check_output(["pw-dump"], text=True, stderr=subprocess.DEVNULL)
+        data = json.loads(out)
+        for item in data:
+            props = item.get("info", {}).get("props", {})
+            addr = props.get("api.bluez5.address", "").lower()
+            if addr == mac_colon and "api.bluez5.codec" in props:
+                return format_codec(props["api.bluez5.codec"])
+    except Exception:
+        pass
+    return None
+
 def get_status():
     resp = send_daemon_cmd("status")
     if resp and resp.get("status") == "ok":
@@ -69,10 +122,15 @@ def get_status():
         else:
             noise_mode = "active"
 
+        codec = dev.get("codec")
+        if not codec and connected:
+            codec = detect_codec(dev.get("mac", ""))
+
         return {
             "connected": connected,
             "device_name": dev.get("name", "Sennheiser Momentum"),
             "mac": dev.get("mac", ""),
+            "codec": codec,
             "battery": dev.get("battery", 100),
             "charging": False,
             "noise_mode": noise_mode,
@@ -98,6 +156,7 @@ def get_status():
             "connected": True,
             "device_name": name or "Sennheiser Momentum",
             "mac": mac,
+            "codec": detect_codec(mac),
             "battery": bat,
             "charging": False,
             "noise_mode": "off",
@@ -112,6 +171,7 @@ def get_status():
         "connected": False,
         "device_name": "Sennheiser Momentum",
         "mac": "",
+        "codec": None,
         "battery": -1,
         "charging": False,
         "noise_mode": "off",

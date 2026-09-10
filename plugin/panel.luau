@@ -302,7 +302,41 @@ local function render()
 	end
 
 	local titleText = snapshot.device_name or noctalia.tr("panel.title") or "Sennheiser Momentum"
-	local statusText = connected and ((noctalia.tr("panel.status.connected") or "Connected") .. (snapshot.mac and (" • " .. snapshot.mac) or "")) or (noctalia.tr("panel.status.disconnected") or "Not Connected")
+
+	local statusRow = {}
+	if connected then
+		table.insert(statusRow, ui.label({
+			text = noctalia.tr("panel.status.connected") or "Connected",
+			fontSize = 11,
+			color = "secondary",
+		}))
+		if snapshot.mac and snapshot.mac ~= "" then
+			table.insert(statusRow, ui.label({
+				text = "• " .. snapshot.mac,
+				fontSize = 11,
+				color = "on_surface_variant",
+			}))
+		end
+		if snapshot.codec and snapshot.codec ~= "" then
+			table.insert(statusRow, ui.label({
+				text = "•",
+				fontSize = 11,
+				color = "on_surface_variant",
+			}))
+			table.insert(statusRow, ui.label({
+				text = snapshot.codec,
+				fontSize = 11,
+				fontWeight = "bold",
+				color = "primary",
+			}))
+		end
+	else
+		table.insert(statusRow, ui.label({
+			text = noctalia.tr("panel.status.disconnected") or "Not Connected",
+			fontSize = 11,
+			color = "on_surface_variant",
+		}))
+	end
 
 	panel.render(ui.column({ flexGrow = 1, gap = 8, padding = 12 }, {
 		ui.row({ align = "center", justify = "space_between", gap = 8 }, {
@@ -321,12 +355,7 @@ local function render()
 					color = "on_surface",
 					maxLines = 1,
 				}),
-				ui.label({
-					text = statusText,
-					fontSize = 11,
-					color = connected and "secondary" or "on_surface_variant",
-					maxLines = 1,
-				}),
+				ui.row({ align = "center", gap = 4 }, statusRow),
 			}),
 			ui.button({
 				glyph = "close",
