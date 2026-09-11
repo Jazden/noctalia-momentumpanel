@@ -17,8 +17,14 @@ Engineered to integrate seamlessly with the ultra-lightweight [`momentumd`](http
 
 * **Floating Control Panel**:
   * Centered over-ear battery meter and connection badge.
+  * **Audio Codec Indicator**: Shows active Bluetooth audio codec (e.g. **aptX HD**, **AAC**, **LDAC**, **SBC-XQ**) right at the header next to the device MAC address.
   * One-tap mode buttons for **Active Noise Cancellation (ANC)**, **Transparency**, and **Off**.
   * **Continuous Transparency Level Slider** (0% to 100%) for fine-tuning ambient awareness.
+  * **Paired Devices & Multipoint Management**:
+    * View all paired devices stored on the headphones with responsive category icons (laptop, mobile, TV, Bluetooth).
+    * Live **Connected** indicator showing active audio links.
+    * One-tap **"Switch"** / **"Connect"** button to command the headphones to transition links between your PC, phone, or other paired devices.
+    * Instant disconnect button to free up an active multipoint slot.
   * **Settings Accordion**:
     * **Bass Boost**: Toggle deep, dynamic low-end punch.
     * **Smart Pause**: Real-time status for wear detection.
@@ -30,6 +36,10 @@ Engineered to integrate seamlessly with the ultra-lightweight [`momentumd`](http
     ```bash
     # Toggle control panel
     noctalia msg panel-toggle jazden/momentum:panel
+
+    # Switch to device index 1 or name
+    noctalia msg plugin jazden/momentum:service all "switch-device 1"
+    noctalia msg plugin jazden/momentum:service all "switch-device Pixel"
 
     # Cycle noise modes
     noctalia msg plugin jazden/momentum:service all cycle-noise

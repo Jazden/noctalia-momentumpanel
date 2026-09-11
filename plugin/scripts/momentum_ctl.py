@@ -139,6 +139,7 @@ def get_status():
             "bass_boost": settings.get("bass_boost", False),
             "sidetone": settings.get("sidetone", 0),
             "wear_detection": settings.get("wear_detection", True),
+            "paired_devices": resp.get("paired_devices", []),
         }
 
     # Fallback if daemon is not running or starting
@@ -165,6 +166,7 @@ def get_status():
             "bass_boost": False,
             "sidetone": 0,
             "wear_detection": True,
+            "paired_devices": [],
         }
 
     return {
@@ -180,6 +182,7 @@ def get_status():
         "bass_boost": False,
         "sidetone": 0,
         "wear_detection": True,
+        "paired_devices": [],
     }
 
 def cmd_anc(arg):
@@ -245,6 +248,22 @@ def cmd_connect(mac=None):
         return {"status": "ok", "connecting": mac}
     return {"status": "error", "message": "No MAC address available"}
 
+def cmd_devices():
+    res = send_daemon_cmd("devices")
+    return res or {"status": "ok", "devices": []}
+
+def cmd_switch_device(target):
+    if not target:
+        return {"status": "error", "message": "missing device index or name"}
+    res = send_daemon_cmd(f"switch-device {target}")
+    return res or {"status": "error", "message": "failed to switch device"}
+
+def cmd_disconnect_device(target):
+    if not target:
+        return {"status": "error", "message": "missing device index or name"}
+    res = send_daemon_cmd(f"disconnect-device {target}")
+    return res or {"status": "error", "message": "failed to disconnect device"}
+
 def main():
     if len(sys.argv) < 2 or sys.argv[1] == "status":
         print(json.dumps(get_status()))
@@ -263,6 +282,14 @@ def main():
     elif sub == "connect":
         arg = sys.argv[2] if len(sys.argv) > 2 else None
         print(json.dumps(cmd_connect(arg)))
+    elif sub in ("devices", "get-devices"):
+        print(json.dumps(cmd_devices()))
+    elif sub in ("switch-device", "switch", "connect-device"):
+        arg = " ".join(sys.argv[2:]) if len(sys.argv) > 2 else ""
+        print(json.dumps(cmd_switch_device(arg)))
+    elif sub in ("disconnect-device", "disconnect"):
+        arg = " ".join(sys.argv[2:]) if len(sys.argv) > 2 else ""
+        print(json.dumps(cmd_disconnect_device(arg)))
     else:
         print(json.dumps({"status": "unknown_command"}))
 

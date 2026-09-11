@@ -6,7 +6,8 @@ local SNAPSHOT_KEY = "momentum_snapshot"
 local COMMAND_KEY = "momentum_command"
 
 local snapshot = noctalia.state.get(SNAPSHOT_KEY) or {}
-local settingsExpanded = true
+local settingsExpanded = false
+local devicesExpanded = true
 
 local commandSeq = 0
 local function sendCommand(action, value)
@@ -184,7 +185,123 @@ local function render()
 
 		table.insert(body, ui.separator({ thickness = 1, color = "outline/0.2" }))
 
-		-- 4. Settings Section (Accordion)
+		-- 4. Paired Devices Section
+		local pairedDevs = snapshot.paired_devices or {}
+		if #pairedDevs > 0 then
+			table.insert(body, ui.separator({ thickness = 1, color = "outline/0.2" }))
+
+			local devicesHeader = ui.row({
+				align = "center",
+				justify = "space_between",
+				onClick = function()
+					devicesExpanded = not devicesExpanded
+					render()
+				end,
+			}, {
+				ui.row({ align = "center", gap = 6 }, {
+					ui.glyph({ name = "devices", size = 14, color = "on_surface_variant" }),
+					ui.label({
+						text = noctalia.tr("panel.paired_devices") or "Paired Devices",
+						fontSize = 11,
+						fontWeight = "bold",
+						color = "on_surface_variant",
+					}),
+				}),
+				ui.button({
+					glyph = devicesExpanded and "chevron-up" or "chevron-down",
+					variant = "ghost",
+					controlSize = "sm",
+					onClick = function()
+						devicesExpanded = not devicesExpanded
+						render()
+					end,
+				}),
+			})
+
+			local devicesContent = { devicesHeader }
+
+			if devicesExpanded then
+				for _, d in ipairs(pairedDevs) do
+					local dName = d.name or ("Device " .. tostring(d.index))
+					local isConn = d.connected == true
+
+					local dLower = string.lower(dName)
+					local devGlyph = "bluetooth"
+					if string.find(dLower, "xps") or string.find(dLower, "arch") or string.find(dLower, "pc") or string.find(dLower, "laptop") or string.find(dLower, "macbook") then
+						devGlyph = "device-laptop"
+					elseif string.find(dLower, "pixel") or string.find(dLower, "phone") or string.find(dLower, "iphone") or string.find(dLower, "galaxy") then
+						devGlyph = "device-mobile"
+					elseif string.find(dLower, "tv") or string.find(dLower, "shield") then
+						devGlyph = "device-tv"
+					end
+
+					local actionWidget
+					if isConn then
+						actionWidget = ui.row({ align = "center", gap = 6 }, {
+							ui.label({
+								text = noctalia.tr("panel.active_connection") or "Connected",
+								fontSize = 11,
+								fontWeight = "bold",
+								color = "secondary",
+							}),
+							ui.button({
+								glyph = "close",
+								variant = "ghost",
+								controlSize = "sm",
+								onClick = function()
+									sendCommand("disconnect_device", d.index)
+								end,
+							}),
+						})
+					else
+						actionWidget = ui.button({
+							text = noctalia.tr("panel.switch_device") or "Switch",
+							variant = "secondary",
+							controlSize = "sm",
+							onClick = function()
+								sendCommand("switch_device", d.index)
+							end,
+						})
+					end
+
+					table.insert(devicesContent, ui.row({
+						align = "center",
+						justify = "space_between",
+						gap = 8,
+						paddingV = 4,
+					}, {
+						ui.row({ align = "center", gap = 8, flexGrow = 1 }, {
+							ui.glyph({
+								name = devGlyph,
+								size = 18,
+								color = isConn and "primary" or "on_surface_variant",
+							}),
+							ui.column({ gap = 1, flexGrow = 1 }, {
+								ui.label({
+									text = dName,
+									fontSize = 13,
+									fontWeight = isConn and "bold" or "normal",
+									color = "on_surface",
+									maxLines = 1,
+								}),
+								ui.label({
+									text = isConn and "Active Audio Link" or (noctalia.tr("panel.paired_connection") or "Paired"),
+									fontSize = 10,
+									color = isConn and "secondary" or "on_surface_variant",
+								}),
+							}),
+						}),
+						actionWidget,
+					}))
+				end
+			end
+
+			table.insert(body, ui.column({ gap = 8 }, devicesContent))
+		end
+
+		table.insert(body, ui.separator({ thickness = 1, color = "outline/0.2" }))
+
+		-- 5. Settings Section (Accordion)
 		local settingsHeader = ui.row({
 			align = "center",
 			justify = "space_between",

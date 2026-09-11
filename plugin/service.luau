@@ -170,6 +170,20 @@ local function connectHeadphones()
 	end)
 end
 
+local function switchDevice(target)
+	local cmd = getCliCmd("switch-device", tostring(target))
+	noctalia.runAsync(cmd, function()
+		pollStatus()
+	end)
+end
+
+local function disconnectDevice(target)
+	local cmd = getCliCmd("disconnect-device", tostring(target))
+	noctalia.runAsync(cmd, function()
+		pollStatus()
+	end)
+end
+
 -- Command listener from panel
 local lastProcessedNonce = nil
 noctalia.state.watch(COMMAND_KEY, function(cmd)
@@ -194,6 +208,10 @@ noctalia.state.watch(COMMAND_KEY, function(cmd)
 		toggleBassBoost()
 	elseif action == "connect" then
 		connectHeadphones()
+	elseif action == "switch_device" then
+		switchDevice(cmd.value)
+	elseif action == "disconnect_device" then
+		disconnectDevice(cmd.value)
 	elseif action == "refresh" then
 		pollStatus()
 	end
@@ -206,6 +224,12 @@ function onIpcMessage(source, msg)
 		toggleBassBoost()
 	elseif msg == "refresh" then
 		pollStatus()
+	elseif string.sub(msg, 1, 14) == "switch-device " then
+		local target = string.sub(msg, 15)
+		switchDevice(target)
+	elseif string.sub(msg, 1, 18) == "disconnect-device " then
+		local target = string.sub(msg, 19)
+		disconnectDevice(target)
 	end
 end
 

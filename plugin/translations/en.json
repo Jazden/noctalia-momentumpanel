@@ -29,7 +29,13 @@
     "sidetone_desc": "Hear your own voice naturally during phone calls",
     "wear_detection": "Smart Pause",
     "wear_detection_desc": "Pause audio automatically when headphones are removed",
-    "connect_button": "Connect Headphones"
+    "connect_button": "Connect Headphones",
+    "paired_devices": "Paired Devices",
+    "switch_device": "Switch",
+    "connect_device": "Connect",
+    "disconnect_device": "Disconnect",
+    "active_connection": "Connected",
+    "paired_connection": "Paired"
   },
   "plugin": {
     "description": "Battery monitor, active noise cancellation (ANC), transparency slider, and bass boost for Sennheiser Momentum headphones",
